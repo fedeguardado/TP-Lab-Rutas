@@ -14,6 +14,7 @@ import * as Recolecciones from './ui-recolecciones.js';
 import * as Parametros from './ui-parametros.js';
 import * as Bases from './ui-bases.js';
 import * as Respaldo from './ui-respaldo.js';
+import { activarBarrasHorizontales } from './barra-horizontal.js';
 
 const SECCIONES = [Proyectos, Propuesta, Recolecciones, Parametros, Bases, Respaldo];
 const PESTANAS = ['proyectos', 'propuesta', 'recolecciones', 'parametros', 'bases'];
@@ -74,6 +75,7 @@ function dibujar() {
 
 /* ---------- Arranque ---------- */
 SECCIONES.forEach(s => s.iniciar(ctx));
+activarBarrasHorizontales();   // barra horizontal fija abajo en todas las tablas
 crearAlmacen(dibujar).then(store => {
   ctx.store = store;
   store.verFecha(ctx.fecha);
