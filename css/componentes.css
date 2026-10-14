@@ -73,7 +73,20 @@ input.numero { font-family: var(--f-datos); max-width: 120px; }
 :root[data-theme="dark"] .cifra b { color: var(--acento-fuerte); }
 
 /* ---------- Tablas ---------- */
-.tabla-caja { overflow-x: auto; border: 1px solid var(--linea); border-radius: var(--radio); }
+/* La caja de la tabla tiene su propio desplazamiento y no pasa del alto de la
+   pantalla: así la barra horizontal queda siempre visible abajo y los títulos
+   de las columnas se quedan fijos arriba al bajar por las filas. */
+.tabla-caja {
+  overflow: auto;
+  max-height: calc(100vh - 200px);   /* alto de pantalla menos la cabecera fija */
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  scrollbar-color: var(--azul-400) var(--panel-suave);   /* Firefox / Chrome nuevos */
+}
+.tabla-caja::-webkit-scrollbar { width: 14px; height: 14px; }
+.tabla-caja::-webkit-scrollbar-track { background: var(--panel-suave); }
+.tabla-caja::-webkit-scrollbar-thumb { background: var(--azul-400); border-radius: 7px; border: 3px solid var(--panel-suave); }
+.tabla-caja::-webkit-scrollbar-thumb:hover { background: var(--acento); }
+thead th { z-index: 1; }
 table { border-collapse: collapse; width: 100%; font-size: var(--t-sm); background: var(--panel); }
 thead th {
   position: sticky; top: 0; background: var(--panel-suave); color: var(--tinta-suave); text-align: left;
