@@ -1,0 +1,137 @@
+/* =====================================================================
+   componentes.css — Tarjetas, formularios, botones, tablas y etiquetas
+   ===================================================================== */
+
+/* ---------- Tarjeta ---------- */
+.tarjeta {
+  background: var(--panel); border: 1px solid var(--linea); border-radius: var(--radio-lg);
+  padding: var(--e-4) var(--e-5); box-shadow: var(--sombra); min-width: 0;
+}
+.tarjeta__cabeza { display: flex; flex-wrap: wrap; gap: var(--e-3); align-items: flex-end; justify-content: space-between; margin-bottom: var(--e-3); }
+.tarjeta__cabeza > div { min-width: 0; }
+
+/* ---------- Formularios ---------- */
+.formulario { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--e-3) var(--e-4); }
+.campo { display: flex; flex-direction: column; gap: var(--e-1); min-width: 0; grid-column: span 3; }
+.campo--2 { grid-column: span 2; } .campo--4 { grid-column: span 4; } .campo--6 { grid-column: span 6; }
+.campo--8 { grid-column: span 8; } .campo--12 { grid-column: 1 / -1; }
+.campo > span, .campo > legend { font-size: var(--t-xs); font-weight: 600; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: .06em; }
+fieldset.campo { border: 0; padding: 0; margin: 0; }
+input, select, textarea {
+  font: inherit; font-size: var(--t-md); color: var(--tinta); background: var(--panel);
+  border: 1px solid var(--linea); border-radius: var(--radio); padding: 8px 10px; min-width: 0; width: 100%;
+}
+textarea { resize: vertical; min-height: 64px; }
+input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-suave); }
+input.numero { font-family: var(--f-datos); max-width: 120px; }
+.lectura { font: 500 var(--t-sm) var(--f-datos); padding: 4px 0; min-height: 20px; }
+.lectura--ok { color: var(--ok); } .lectura--error { color: var(--error); } .lectura--alerta { color: var(--alerta); }
+
+/* Casillas tipo "chip" (ensayos, personas, vehículos, meses) */
+.casillas { display: flex; flex-wrap: wrap; gap: var(--e-2); }
+.casilla {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border: 1px solid var(--linea);
+  border-radius: 999px; background: var(--panel); font-size: var(--t-sm); cursor: pointer; user-select: none;
+}
+.casilla input { width: auto; margin: 0; accent-color: var(--acento); }
+.casilla:has(input:checked) { background: var(--acento-suave); border-color: var(--acento); color: var(--tinta); font-weight: 600; }
+.casilla--alerta:has(input:checked) { background: var(--error-suave); border-color: var(--error); }
+.casilla small { color: var(--tinta-suave); font-weight: 400; }
+
+/* ---------- Botones ---------- */
+.botones { display: flex; flex-wrap: wrap; gap: var(--e-2); align-items: center; }
+.boton {
+  font: 600 var(--t-sm) var(--f-texto); color: var(--tinta); background: var(--panel);
+  border: 1px solid var(--linea); border-radius: var(--radio); padding: 8px 14px; cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.boton:hover { border-color: var(--acento); }
+.boton--primario { background: var(--acento-fuerte); border-color: var(--acento-fuerte); color: var(--sobre-acento); }
+.boton--primario:hover { background: var(--acento); }
+.boton--peligro { color: var(--error); border-color: var(--error); }
+.boton--peligro.confirmar { background: var(--error); color: #fff; }
+.boton--chico { font-size: var(--t-xs); padding: 4px 10px; }
+.boton:disabled { opacity: .5; cursor: default; }
+
+.mensaje { font-size: var(--t-sm); min-height: 20px; margin-top: var(--e-2); }
+.mensaje--ok { color: var(--ok); } .mensaje--error { color: var(--error); }
+
+/* ---------- Avisos ---------- */
+.aviso { border-radius: var(--radio); padding: var(--e-3) var(--e-4); font-size: var(--t-sm); border: 1px solid; }
+.aviso--info { background: var(--acento-suave); border-color: var(--azul-300); color: var(--tinta); }
+.aviso--alerta { background: var(--alerta-suave); border-color: var(--alerta); color: var(--tinta); }
+.aviso--error { background: var(--error-suave); border-color: var(--error); color: var(--tinta); }
+.aviso ul { margin: 4px 0 0; padding-left: 18px; }
+
+/* ---------- Resumen en cifras ---------- */
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--e-3); }
+.cifra { background: var(--panel); border: 1px solid var(--linea); border-radius: var(--radio-lg); padding: var(--e-3) var(--e-4); border-top: 3px solid var(--azul-400); }
+.cifra b { display: block; font: 600 30px/1.15 var(--f-datos); color: var(--azul-700); }
+.cifra span { font-size: var(--t-sm); color: var(--tinta-suave); }
+.cifra--error { border-top-color: var(--error); } .cifra--error b { color: var(--error); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cifra b { color: var(--acento-fuerte); } }
+:root[data-theme="dark"] .cifra b { color: var(--acento-fuerte); }
+
+/* ---------- Tablas ---------- */
+.tabla-caja { overflow-x: auto; border: 1px solid var(--linea); border-radius: var(--radio); }
+table { border-collapse: collapse; width: 100%; font-size: var(--t-sm); background: var(--panel); }
+thead th {
+  position: sticky; top: 0; background: var(--panel-suave); color: var(--tinta-suave); text-align: left;
+  font: 700 14px var(--f-titulo); text-transform: uppercase; letter-spacing: .05em; padding: 10px 12px;
+  border-bottom: 1px solid var(--linea); white-space: nowrap;
+}
+td { padding: 10px 12px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: var(--panel-suave); }
+td.dato { font-family: var(--f-datos); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.centro { text-align: center; }
+.sub { display: block; font-size: var(--t-xs); color: var(--tinta-suave); }
+tr.fila--sin td { background: var(--error-suave); }
+tr.fila--grupo td { background: var(--acento-suave); font: 700 var(--t-sm) var(--f-titulo); letter-spacing: .02em; }
+td input.obs { min-width: 180px; font-size: var(--t-sm); padding: 5px 8px; }
+.vacio { padding: var(--e-5); text-align: center; color: var(--tinta-suave); border: 1px dashed var(--linea); border-radius: var(--radio); background: var(--panel); }
+
+/* ---------- Etiquetas ---------- */
+.etiqueta { display: inline-block; font: 600 14px var(--f-texto); padding: 2px 9px; border-radius: 5px; white-space: nowrap; margin: 1px 2px 1px 0; }
+.etiqueta--zona { background: var(--azul-800); color: #fff; }
+.etiqueta--DOM { background: #021B79; } .etiqueta--ZONA1 { background: #0a47ad; } .etiqueta--ZONA2 { background: #0461c7; }
+.etiqueta--ensayo { background: var(--acento-suave); color: var(--tinta); }
+.etiqueta--ok { background: var(--ok-suave); color: var(--ok); }
+.etiqueta--alerta { background: var(--alerta-suave); color: var(--alerta); }
+.etiqueta--error { background: var(--error-suave); color: var(--error); }
+.etiqueta--gris { background: var(--panel-suave); color: var(--tinta-suave); }
+
+/* Matriz de bases */
+.matriz td.centro { font-family: var(--f-datos); }
+.si { color: var(--ok); font-weight: 700; } .no { color: var(--linea); }
+
+/* ---------- Teléfono ---------- */
+@media (max-width: 900px) {
+  .campo, .campo--2, .campo--4 { grid-column: span 6; }
+  .campo--6, .campo--8 { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .campo, .campo--2, .campo--4 { grid-column: 1 / -1; }
+  .tarjeta { padding: var(--e-3) var(--e-4); }
+}
+
+/* ---------- Hora de salida recomendada (formulario de proyecto) ---------- */
+.recomendada {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--e-4);
+  background: var(--panel-suave); border: 1px solid var(--linea); border-left: 0;
+  border-radius: var(--radio); padding: var(--e-2) var(--e-3); font-size: var(--t-sm); color: var(--tinta-suave);
+}
+.recomendada__hora { font: 600 26px/1.1 var(--f-datos); color: var(--acento-fuerte); }
+.recomendada__otras { width: 100%; font-size: var(--t-xs); }
+.recomendada .boton { padding: 3px 10px; }
+
+/* ---------- Panel para marcar ensayos fila por fila ---------- */
+tr.fila-revision > td { background: var(--acento-suave); padding: var(--e-3) var(--e-4) var(--e-4); }
+tr.fila-revision:hover > td { background: var(--acento-suave); }
+.revision { display: grid; gap: var(--e-3); }
+.revision__titulo { display: grid; gap: 2px; }
+.revision .casilla { background: var(--panel); }
+/* Columna del nombre del proyecto más ancha para que las filas no queden tan altas */
+#listaProyectos td:nth-child(4) { min-width: 380px; }
+#tablaPropuesta td:first-child { min-width: 340px; }
+#tablaPropuesta td:nth-child(4) { min-width: 190px; }

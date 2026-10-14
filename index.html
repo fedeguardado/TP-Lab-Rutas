@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2545">
+<title>TP Lab Rutas</title>
+<!-- =====================================================================
+     TP Lab Rutas — Propuesta diaria de técnicos, vehículos y rutas
+     Estructura: cabecera (marca, día de trabajo, pestañas) y 5 secciones.
+     Estilos en css/ y lógica en js/ (ver comentarios en cada archivo).
+     ===================================================================== -->
+<link rel="icon" type="image/svg+xml" href="img/icono.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="img/icono-32.png">
+<link rel="apple-touch-icon" href="img/icono-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+
+<!-- ========================= CABECERA ========================= -->
+<header class="cabecera">
+  <div class="cabecera__fila">
+    <div class="marca">
+      <svg class="marca__logo" viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="gLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0575E6"/><stop offset="1" stop-color="#021B79"/></linearGradient></defs>
+        <rect width="64" height="64" rx="14" fill="url(#gLogo)"/>
+        <path d="M14 46c8-14 16 2 24-10s10-14 12-16" fill="none" stroke="#bcd3f0" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 7"/>
+        <circle cx="14" cy="46" r="5" fill="#fff"/>
+        <path d="M50 8a8 8 0 0 0-8 8c0 6 8 14 8 14s8-8 8-14a8 8 0 0 0-8-8z" fill="#fff"/>
+        <circle cx="50" cy="16" r="3" fill="#0575E6"/>
+      </svg>
+      <div>
+        <h1 class="marca__nombre">TP Lab</h1>
+        <div class="marca__sub">Rutas y asignación diaria</div>
+      </div>
+    </div>
+
+    <!-- Día de trabajo: todo lo que se ve depende de esta fecha -->
+    <div class="dia" aria-label="Día de trabajo">
+      <span class="dia__etiqueta">Día</span>
+      <button class="boton-claro" id="diaAnterior" type="button" aria-label="Día anterior">‹</button>
+      <input type="date" id="fecha" aria-label="Fecha de trabajo">
+      <button class="boton-claro" id="diaSiguiente" type="button" aria-label="Día siguiente">›</button>
+      <button class="boton-claro" id="diaHoy" type="button">Hoy</button>
+      <span class="estado-datos" id="estadoDatos">Conectando…</span>
+    </div>
+
+    <!-- Respaldo (log) del día: guarda o restaura en Excel solo lo cargado ese día -->
+    <div class="respaldo" aria-label="Respaldo del día">
+      <button class="boton-claro boton-claro--fuerte" id="btnRespaldoBajar" type="button">⭳ Guardar log del día</button>
+      <label class="boton-claro" for="archivoRespaldo">⭱ Cargar log del día</label>
+      <input type="file" id="archivoRespaldo" accept=".xlsx" hidden>
+    </div>
+  </div>
+
+  <nav class="pestanas" role="tablist" aria-label="Secciones">
+    <button role="tab" id="tab-proyectos" aria-controls="sec-proyectos" aria-selected="true" data-tab="proyectos">Proyectos del día<span class="contador" id="cuentaProyectos">0</span></button>
+    <button role="tab" id="tab-propuesta" aria-controls="sec-propuesta" aria-selected="false" data-tab="propuesta">Propuesta</button>
+    <button role="tab" id="tab-recolecciones" aria-controls="sec-recolecciones" aria-selected="false" data-tab="recolecciones">Recolecciones<span class="contador" id="cuentaRecolecciones">0</span></button>
+    <button role="tab" id="tab-parametros" aria-controls="sec-parametros" aria-selected="false" data-tab="parametros">Parámetros</button>
+    <button role="tab" id="tab-bases" aria-controls="sec-bases" aria-selected="false" data-tab="bases">Bases</button>
+  </nav>
+</header>
+
+<main>
+  <!-- Mensajes y confirmación del log (respaldo) del día -->
+  <div id="barraRespaldo" class="barra-respaldo" aria-live="polite"></div>
+
+  <!-- ===================== 1. PROYECTOS DEL DÍA ===================== -->
+  <section class="seccion" id="sec-proyectos" role="tabpanel" aria-labelledby="tab-proyectos">
+    <article class="tarjeta">
+      <div class="tarjeta__cabeza">
+        <div>
+          <h2 id="tituloFormulario">Agregar proyecto</h2>
+          <p class="ayuda">También puedes cargar varios a la vez desde Excel (abajo). Ubicación: enlace largo de Google Maps, grados-minutos-segundos o coordenadas decimales.</p>
+        </div>
+      </div>
+      <form id="formProyecto" class="formulario" autocomplete="off" novalidate>
+        <label class="campo campo--2"><span>Zona</span>
+          <select id="pZona" required></select>
+        </label>
+        <label class="campo campo--4"><span>Nombre del proyecto</span>
+          <input id="pNombre" required placeholder="Ej. Remodelación del Centro Escolar Cantón El Cortez…">
+        </label>
+        <label class="campo campo--2"><span>Fecha programada</span>
+          <input id="pFecha" type="date" required>
+        </label>
+        <label class="campo campo--2"><span>Hora de llegada</span>
+          <input id="pLlegada" type="time" required>
+        </label>
+        <label class="campo campo--2"><span>Hora de salida</span>
+          <input id="pSalida" type="time">
+        </label>
+
+        <label class="campo campo--8"><span>Ubicación (Google Maps)</span>
+          <input id="pUbicacion" required placeholder="https://www.google.com/maps/place/…  ·  13°38'02.5&quot;N 89°06'11.3&quot;W  ·  13.6340, -89.1031">
+        </label>
+        <div class="campo campo--4"><span>Lectura de la ubicación</span>
+          <div class="lectura" id="pLectura" aria-live="polite">—</div>
+        </div>
+
+        <!-- Hora de salida recomendada: se calcula al escribir ubicación y hora de llegada -->
+        <div class="campo campo--12"><span>Hora de salida recomendada</span>
+          <div class="recomendada" id="pSalidaRec" aria-live="polite">Escribe la ubicación y la hora de llegada para calcularla.</div>
+        </div>
+
+        <fieldset class="campo campo--12"><legend>Ensayos que pide el proyecto</legend>
+          <div class="casillas" id="pEnsayos"></div>
+        </fieldset>
+
+        <fieldset class="campo campo--4"><legend>Transporte</legend>
+          <div class="casillas">
+            <label class="casilla"><input type="radio" name="pTransporte" value="TPLAB" checked> TP Lab</label>
+            <label class="casilla"><input type="radio" name="pTransporte" value="CLIENTE"> Cliente</label>
+          </div>
+        </fieldset>
+        <label class="campo campo--8"><span>Actividad a realizar / tipo de muestra (va al Excel)</span>
+          <textarea id="pActividad" rows="2" placeholder='Ej. 5 CILINDROS DE CONCRETO (4"X8"), CONTROL DE TEMPERATURA Y REVENIMIENTO'></textarea>
+        </label>
+        <label class="campo campo--12"><span>Observaciones</span>
+          <input id="pObservaciones" placeholder="Ej. Llevar carretilla">
+        </label>
+
+        <div class="campo campo--12">
+          <div class="botones">
+            <button class="boton boton--primario" type="submit" id="btnGuardarProyecto">Agregar proyecto</button>
+            <button class="boton" type="button" id="btnCancelarEdicion" hidden>Cancelar edición</button>
+          </div>
+          <div class="mensaje" id="msgProyecto" aria-live="polite"></div>
+        </div>
+      </form>
+    </article>
+
+    <article class="tarjeta ancho-completo">
+      <div class="tarjeta__cabeza">
+        <div>
+          <h2 id="tituloLista">Proyectos del día</h2>
+          <p class="ayuda">Después de cargar el Excel, abre <b>Ensayos ▾</b> en cada fila, marca las casillas y usa <b>Confirmar y siguiente</b>. Si falta la ubicación, ahí mismo se pega.</p>
+        </div>
+        <div class="botones">
+          <label class="boton boton--primario" for="archivoProyectos">⭱ Cargar proyectos desde Excel</label>
+          <input type="file" id="archivoProyectos" accept=".xlsx,.xls" hidden>
+          <!-- Limpiar día: borra proyectos, propuesta y restricciones SOLO del día visible (pide confirmar) -->
+          <button class="boton boton--peligro" type="button" id="btnLimpiarDia">Limpiar día</button>
+        </div>
+      </div>
+      <div class="mensaje" id="msgImportar" aria-live="polite"></div>
+      <div id="listaProyectos"></div>
+    </article>
+  </section>
+
+  <!-- ===================== 2. PROPUESTA ===================== -->
+  <section class="seccion" id="sec-propuesta" role="tabpanel" aria-labelledby="tab-propuesta" hidden>
+    <article class="tarjeta">
+      <div class="tarjeta__cabeza">
+        <div>
+          <h2 id="tituloPropuesta">Propuesta del día</h2>
+          <p class="ayuda">La app propone persona, vehículo y quién lleva a quién. Es una sugerencia: el resultado final se ajusta en el Excel. Distancias y horas recomendadas son estimadas; usa “ruta” para verlas en Google Maps.</p>
+        </div>
+        <div class="botones">
+          <button class="boton boton--primario" type="button" id="btnGenerar">Generar propuesta</button>
+          <button class="boton" type="button" id="btnExcelRutas">Descargar Excel</button>
+        </div>
+      </div>
+      <div class="mensaje" id="msgPropuesta" aria-live="polite"></div>
+    </article>
+    <div id="avisosPropuesta"></div>
+    <div class="cifras" id="cifrasPropuesta"></div>
+    <article class="tarjeta"><div id="tablaPropuesta"></div></article>
+  </section>
+
+  <!-- ===================== 3. RECOLECCIONES ===================== -->
+  <section class="seccion" id="sec-recolecciones" role="tabpanel" aria-labelledby="tab-recolecciones" hidden>
+    <article class="tarjeta">
+      <div class="tarjeta__cabeza">
+        <div>
+          <h2>Informe de recolecciones</h2>
+          <p class="ayuda">Concreto, cubos de mortero y prismas de grout: máximo 48 h. Lodocreto: de 3 a 4 días. El día sugerido es el primero del plazo (sin domingos), agrupando sitios cercanos.</p>
+        </div>
+        <div class="botones">
+          <label class="casilla"><input type="checkbox" id="verRecogidas"> Mostrar recogidas</label>
+          <button class="boton boton--primario" type="button" id="btnExcelRecolecciones">Descargar Excel</button>
+        </div>
+      </div>
+      <div class="mensaje" id="msgRecolecciones" aria-live="polite"></div>
+      <div id="tablaRecolecciones"></div>
+    </article>
+  </section>
+
+  <!-- ===================== 4. PARÁMETROS ===================== -->
+  <section class="seccion" id="sec-parametros" role="tabpanel" aria-labelledby="tab-parametros" hidden>
+    <article class="tarjeta">
+      <div class="tarjeta__cabeza">
+        <div>
+          <h2 id="tituloRestricciones">Restricciones del día</h2>
+          <p class="ayuda">Solo aplican al día seleccionado. Marca lo que NO está disponible.</p>
+        </div>
+      </div>
+      <form id="formRestricciones" class="formulario">
+        <fieldset class="campo campo--12"><legend>Personal no disponible (incapacidad, permiso…)</legend>
+          <div class="casillas" id="rPersonal"></div>
+        </fieldset>
+        <fieldset class="campo campo--12"><legend>Vehículos no disponibles (mantenimiento…)</legend>
+          <div class="casillas" id="rVehiculos"></div>
+        </fieldset>
+        <fieldset class="campo campo--12"><legend>Técnico que no debe ir a un proyecto (cambio pedido por el administrador)</legend>
+          <div class="formulario">
+            <label class="campo campo--4"><span>Técnico</span><select id="rProhPersona"></select></label>
+            <label class="campo campo--6"><span>Proyecto</span><select id="rProhProyecto"></select></label>
+            <div class="campo campo--2"><span>&nbsp;</span><button class="boton" type="button" id="btnAgregarProhibicion">Agregar</button></div>
+          </div>
+          <div id="rProhibiciones"></div>
+        </fieldset>
+        <div class="campo campo--12">
+          <div class="botones"><button class="boton boton--primario" type="submit">Guardar restricciones del día</button></div>
+          <div class="mensaje" id="msgRestricciones" aria-live="polite"></div>
+        </div>
+      </form>
+    </article>
+
+    <article class="tarjeta">
+      <div class="tarjeta__cabeza">
+        <div>
+          <h2>Parámetros generales</h2>
+          <p class="ayuda">Aplican a todos los días.</p>
+        </div>
+      </div>
+      <form id="formParametros" class="formulario">
+        <label class="campo"><span>Zona 2: horas libres mínimas para 2 proyectos</span>
+          <input class="numero" id="aHoras" type="number" min="0" max="12" step="0.5"></label>
+        <label class="campo"><span>Velocidad promedio (km/h)</span>
+          <input class="numero" id="aVelocidad" type="number" min="10" max="100" step="1"></label>
+        <label class="campo"><span>Factor de carretera</span>
+          <input class="numero" id="aFactor" type="number" min="1" max="3" step="0.05"></label>
+        <label class="campo"><span>Llegar antes de la hora (min)</span>
+          <input class="numero" id="aMargen" type="number" min="0" max="120" step="5"></label>
+        <label class="campo"><span>Pasajeros por vehículo</span>
+          <input class="numero" id="aCapacidad" type="number" min="1" max="10" step="1"></label>
+        <label class="campo"><span>Desvío máximo para llevar a alguien (min)</span>
+          <input class="numero" id="aDesvio" type="number" min="0" max="240" step="5"></label>
+        <label class="campo"><span>Compartir vehículo entre técnicos que manejan: desvío máx. (min, 0 = no)</span>
+          <input class="numero" id="aCompartir" type="number" min="0" max="120" step="5"></label>
+        <fieldset class="campo campo--12"><legend>Personal de reserva (carga fija en el laboratorio: se usa solo si no alcanza el resto)</legend>
+          <div class="casillas" id="aReserva"></div>
+        </fieldset>
+        <fieldset class="campo campo--6"><legend>Meses de verano (densímetro en cualquier vehículo)</legend>
+          <div class="casillas" id="aMeses"></div>
+        </fieldset>
+        <div class="campo campo--12">
+          <p class="ayuda"><b>Factor de carretera:</b> cuánto más larga es la ruta real que la línea recta (1.35 es típico). <b>Horas libres:</b> hora de llegada del 2º proyecto − hora del 1º − viaje entre ambos.</p>
+          <div class="botones"><button class="boton boton--primario" type="submit">Guardar parámetros</button></div>
+          <div class="mensaje" id="msgParametros" aria-live="polite"></div>
+        </div>
+      </form>
+    </article>
+  </section>
+
+  <!-- ===================== 5. BASES (solo lectura) ===================== -->
+  <section class="seccion" id="sec-bases" role="tabpanel" aria-labelledby="tab-bases" hidden>
+    <article class="tarjeta">
+      <h2>Bases fijas</h2>
+      <p class="ayuda">Personal, vehículos, ensayos, equipos y puntos de salida que usa la app. Se modifican en el archivo js/bases.js.</p>
+    </article>
+    <div id="contenidoBases"></div>
+  </section>
+</main>
+
+<!-- Librería para leer y escribir Excel (SheetJS) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Arranque de la app -->
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
